@@ -23,6 +23,3 @@ class Person(name: String, val age: Int = 0) {
 
   def this() = this("John Doe")
 }
-
-
-// Itt jarok: OOPBasics - 7.31
