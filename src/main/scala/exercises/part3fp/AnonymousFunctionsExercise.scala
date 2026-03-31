@@ -1,28 +1,15 @@
 package exercises.part3fp
 
-import exercises.part2oop.MyGenericListExercise.{listOfIntegers, listOfStrings}
-import exercises.part2oop.{GenericCons, GenericEmpty, MyGenericList}
-import exercises.part2oop.MyGenericListExpandedExercise.{GenericCons, GenericEmpty, MyGenericList, MyPredicate, MyTransformer, listOfIntegers}
-import exercises.part2oop.MyGenericListExpandedWithCaseClassesExercise.{GenericCons, GenericEmpty, MyGenericList, listOfIntegers}
+import exercises.part3fp.WhatsAFunctionExercise.superAdder
 
 /*
-    1.  a function which takes 2 strings and concatenates them
-    2.  transform the MyPredicate and MyTransformer into function types
-    3.  define a function which takes an int and returns another function which takes an int and returns an int
-        - what's the type of this function
-        - how to do it
+    1.  MyList: replace all FunctionX calls with lambdas
+    2.  Rewrite the "special" adder as an anonymous function
    */
 
-object WhatsAFunctionExercise extends App {
+object AnonymousFunctionsExercise extends App {
 
   // 1)
-  def concatenator: (String, String) => String = new Function2[String, String, String] {
-    override def apply(a: String, b: String): String = a + b
-  }
-
-  println(concatenator("Hello ", "Scala"))
-
-  // 2)
   abstract class MyGenericList[+A] {
     def head: A
     def tail: MyGenericList[A]
@@ -35,6 +22,7 @@ object WhatsAFunctionExercise extends App {
     def map[B](transformer: A => B): MyGenericList[B]
     def flatMap[B](transformer: A => MyGenericList[B]): MyGenericList[B]
     def filter(predicate: A => Boolean): MyGenericList[A]
+
     // concatenation
     def ++[B >: A](list: MyGenericList[B]): MyGenericList[B]
   }
@@ -49,6 +37,7 @@ object WhatsAFunctionExercise extends App {
     def map[B](transformer: Nothing => B): MyGenericList[B] = GenericEmpty
     def flatMap[B](transformer: Nothing => MyGenericList[B]): MyGenericList[B] = GenericEmpty
     def filter(predicate: Nothing => Boolean): MyGenericList[Nothing] = GenericEmpty
+
     def ++[B >: Nothing](list: MyGenericList[B]): MyGenericList[B] = list
   }
 
@@ -88,28 +77,19 @@ object WhatsAFunctionExercise extends App {
   println(listOfIntegers.toString)
   println(listOfStrings.toString)
 
-  println(listOfIntegers.map(new Function1[Int, Int] {
-    override def apply(elem: Int): Int = elem * 2
-  }).toString)
+  println(listOfIntegers.map(elem => elem * 2).toString)
+  println(listOfIntegers.map(_ * 2).toString)
 
-  println(listOfIntegers.filter(new Function1[Int, Boolean] {
-    override def apply(elem: Int): Boolean = elem % 2 == 0
-  }).toString)
+  println(listOfIntegers.filter(elem => elem % 2 == 0).toString)
+  println(listOfIntegers.filter(_ % 2 == 0).toString)
 
   println((listOfIntegers ++ anotherListOfIntegers).toString)
-  println(listOfIntegers.flatMap(new Function1[Int, MyGenericList[Int]] {
-    override def apply(elem: Int): MyGenericList[Int] = new GenericCons[Int](elem, new GenericCons[Int](elem + 1, GenericEmpty))
-  }).toString)
+  println(listOfIntegers.flatMap(elem => new GenericCons[Int](elem, new GenericCons[Int](elem + 1, GenericEmpty))).toString)
 
   println(listOfIntegers == cloneListOfIntegers)
 
-  // 3)
-  // Function1[Int, Function1[Int, Int]]
-  val superAdder: Function1[Int, Function1[Int, Int]] = new Function1[Int, Function1[Int, Int]] {
-    override def apply(x: Int): Function1[Int, Int] = new Function1[Int, Int] {
-      override def apply(y: Int): Int = x + y
-    }
-  }
+  // 2)
+  val superAdder = (x: Int) => (y: Int) => x + y
 
   val adder3 = superAdder(3)
   println(adder3(4)) // prints 7
