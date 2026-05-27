@@ -1,4 +1,4 @@
-package exercises.part3fp
+package lectures.part3fp
 
 import scala.annotation.tailrec
 
